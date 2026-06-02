@@ -1,5 +1,50 @@
 #!/usr/bin/env node
+const fs = require('fs');
+const path = require('path');
+const { spawn } = require('child_process');
 const { deployContract } = require('./index');
+
+function detectEnvironment(cwd = process.cwd()) {
+  const foundryPath = path.join(cwd, 'foundry.toml');
+  const hardhatConfigs = [
+    'hardhat.config.js',
+    'hardhat.config.ts',
+    'hardhat.config.cjs',
+    'hardhat.config.mjs',
+  ];
+
+  const hasFoundry = fs.existsSync(foundryPath);
+  const hasHardhat = hardhatConfigs.some((name) =>
+    fs.existsSync(path.join(cwd, name)),
+  );
+
+  if (hasFoundry) return 'foundry';
+  if (hasHardhat) return 'hardhat';
+  return null;
+}
+
+function runCommand(command, args) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(command, args, { stdio: 'inherit' });
+    child.on('error', (err) => reject(err));
+    child.on('close', (code, signal) => {
+      if (code === 0) return resolve();
+      const suffix = signal ? ` (signal ${signal})` : ` (exit ${code})`;
+      reject(new Error(`Command failed: ${command} ${args.join(' ')}${suffix}`));
+    });
+  });
+}
+
+async function runCompileIfNeeded() {
+  const env = detectEnvironment();
+  if (env === 'foundry') {
+    console.log('Detected Foundry project. Running forge build...');
+    await runCommand('forge', ['build']);
+  } else if (env === 'hardhat') {
+    console.log('Detected Hardhat project. Running npx hardhat compile...');
+    await runCommand('npx', ['hardhat', 'compile']);
+  }
+}
 
 function usage() {
   console.log(
@@ -32,6 +77,8 @@ async function main() {
   console.log('Compiling', opts.file, 'contract', opts.contract);
   console.log('Network:', opts.network || 'testnet');
 
+  await runCompileIfNeeded();
+
   const { address } = await deployContract({
     file: opts.file,
     contract: opts.contract,
@@ -55,4 +102,12 @@ if (require.main === module) {
   runCli();
 }
 
-module.exports = { parseArgs, usage, main, runCli };
+module.exports = {
+  parseArgs,
+  usage,
+  main,
+  runCli,
+  detectEnvironment,
+  runCompileIfNeeded,
+  runCommand,
+};
