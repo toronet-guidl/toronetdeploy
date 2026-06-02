@@ -15,7 +15,11 @@ function setupTempProject() {
   fs.mkdirSync(contractsDir, { recursive: true });
   const filePath = path.join(contractsDir, 'Main.sol');
   fs.writeFileSync(filePath, 'contract Main {}', 'utf8');
-  return { dir, filePath, cleanup: () => fs.rmSync(dir, { recursive: true, force: true }) };
+  return {
+    dir,
+    filePath,
+    cleanup: () => fs.rmSync(dir, { recursive: true, force: true }),
+  };
 }
 
 function makeOutput(filePath, contractName) {
@@ -52,7 +56,13 @@ describe('compileSolidity import resolution', () => {
     const foundry = 'remappings = ["@oz/=lib/openzeppelin-contracts/"]';
     fs.writeFileSync(path.join(temp.dir, 'foundry.toml'), foundry, 'utf8');
 
-    const target = path.join(temp.dir, 'lib', 'openzeppelin-contracts', 'token', 'ERC20');
+    const target = path.join(
+      temp.dir,
+      'lib',
+      'openzeppelin-contracts',
+      'token',
+      'ERC20',
+    );
     fs.mkdirSync(target, { recursive: true });
     const importFile = path.join(target, 'ERC20.sol');
     fs.writeFileSync(importFile, 'ERC20', 'utf8');
@@ -71,7 +81,7 @@ describe('compileSolidity import resolution', () => {
       'remappings = [',
       '  "@a/=lib/a/",',
       '  "@b/=lib/b/"',
-      ']'
+      ']',
     ].join('\n');
     fs.writeFileSync(path.join(temp.dir, 'foundry.toml'), foundry, 'utf8');
 
@@ -141,7 +151,11 @@ describe('compileSolidity import resolution', () => {
   });
 
   test('falls back to relative path', () => {
-    fs.writeFileSync(path.join(path.dirname(temp.filePath), 'Rel.sol'), 'REL', 'utf8');
+    fs.writeFileSync(
+      path.join(path.dirname(temp.filePath), 'Rel.sol'),
+      'REL',
+      'utf8',
+    );
 
     solc.compile.mockImplementation((input, options) => {
       const result = options.import('Rel.sol');

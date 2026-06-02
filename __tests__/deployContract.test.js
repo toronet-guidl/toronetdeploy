@@ -25,23 +25,27 @@ describe('deployContract validation', () => {
   });
 
   test('missing file throws', async () => {
-    await expect(deployContract({ contract: 'C', owner: '0x' + 'a'.repeat(40) }))
-      .rejects.toThrow('file');
+    await expect(
+      deployContract({ contract: 'C', owner: '0x' + 'a'.repeat(40) }),
+    ).rejects.toThrow('file');
   });
 
   test('missing contract throws', async () => {
-    await expect(deployContract({ file: 'f.sol', owner: '0x' + 'a'.repeat(40) }))
-      .rejects.toThrow('contract');
+    await expect(
+      deployContract({ file: 'f.sol', owner: '0x' + 'a'.repeat(40) }),
+    ).rejects.toThrow('contract');
   });
 
   test('missing owner throws', async () => {
-    await expect(deployContract({ file: 'f.sol', contract: 'C' }))
-      .rejects.toThrow('owner');
+    await expect(
+      deployContract({ file: 'f.sol', contract: 'C' }),
+    ).rejects.toThrow('owner');
   });
 
   test('invalid owner address format throws', async () => {
-    await expect(deployContract({ file: 'f.sol', contract: 'C', owner: '0x123' }))
-      .rejects.toThrow('valid Toronet address');
+    await expect(
+      deployContract({ file: 'f.sol', contract: 'C', owner: '0x123' }),
+    ).rejects.toThrow('valid Toronet address');
   });
 
   test('network defaults to testnet', async () => {
@@ -79,7 +83,9 @@ describe('deployContract args handling', () => {
     });
 
     expect(parseConstructorArgs).not.toHaveBeenCalled();
-    expect(deploySmartContract).toHaveBeenCalledWith(expect.objectContaining({ constructorArgs: args }));
+    expect(deploySmartContract).toHaveBeenCalledWith(
+      expect.objectContaining({ constructorArgs: args }),
+    );
   });
 
   test('args passed as JSON string are parsed', async () => {
@@ -93,7 +99,9 @@ describe('deployContract args handling', () => {
     });
 
     expect(parseConstructorArgs).toHaveBeenCalledWith('["x"]');
-    expect(deploySmartContract).toHaveBeenCalledWith(expect.objectContaining({ constructorArgs: ['x'] }));
+    expect(deploySmartContract).toHaveBeenCalledWith(
+      expect.objectContaining({ constructorArgs: ['x'] }),
+    );
   });
 
   test('args passed as CSV string are parsed', async () => {
@@ -107,7 +115,9 @@ describe('deployContract args handling', () => {
     });
 
     expect(parseConstructorArgs).toHaveBeenCalledWith('a,2');
-    expect(deploySmartContract).toHaveBeenCalledWith(expect.objectContaining({ constructorArgs: ['a', 2] }));
+    expect(deploySmartContract).toHaveBeenCalledWith(
+      expect.objectContaining({ constructorArgs: ['a', 2] }),
+    );
   });
 
   test('args omitted default to []', async () => {
@@ -120,7 +130,9 @@ describe('deployContract args handling', () => {
     });
 
     expect(parseConstructorArgs).toHaveBeenCalledWith(undefined);
-    expect(deploySmartContract).toHaveBeenCalledWith(expect.objectContaining({ constructorArgs: [] }));
+    expect(deploySmartContract).toHaveBeenCalledWith(
+      expect.objectContaining({ constructorArgs: [] }),
+    );
   });
 });
 
@@ -144,7 +156,7 @@ describe('deployContract SDK interactions', () => {
         file: 'f.sol',
         contract: 'C',
         owner: '0x' + 'a'.repeat(40),
-      })
+      }),
     ).rejects.toThrow('SDK initialization failed: boom');
   });
 
@@ -156,7 +168,7 @@ describe('deployContract SDK interactions', () => {
         file: 'f.sol',
         contract: 'C',
         owner: '0x' + 'a'.repeat(40),
-      })
+      }),
     ).rejects.toThrow('fail');
   });
 
@@ -168,7 +180,7 @@ describe('deployContract SDK interactions', () => {
         file: 'f.sol',
         contract: 'C',
         owner: '0x' + 'a'.repeat(40),
-      })
+      }),
     ).resolves.toEqual({ address: '0xabc', abi: ['abi'] });
   });
 
@@ -182,7 +194,9 @@ describe('deployContract SDK interactions', () => {
       token: 'tok',
     });
 
-    expect(deploySmartContract).toHaveBeenCalledWith(expect.objectContaining({ token: 'tok' }));
+    expect(deploySmartContract).toHaveBeenCalledWith(
+      expect.objectContaining({ token: 'tok' }),
+    );
   });
 
   test('token is undefined when omitted', async () => {
@@ -194,6 +208,8 @@ describe('deployContract SDK interactions', () => {
       owner: '0x' + 'a'.repeat(40),
     });
 
-    expect(deploySmartContract).toHaveBeenCalledWith(expect.objectContaining({ token: undefined }));
+    expect(deploySmartContract).toHaveBeenCalledWith(
+      expect.objectContaining({ token: undefined }),
+    );
   });
 });

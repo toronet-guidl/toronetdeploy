@@ -4,7 +4,8 @@ const solc = require('solc');
 
 function compileSolidity(filePath, contractName) {
   const absPath = path.resolve(filePath);
-  if (!fs.existsSync(absPath)) throw new Error('Solidity file not found: ' + absPath);
+  if (!fs.existsSync(absPath))
+    throw new Error('Solidity file not found: ' + absPath);
   const source = fs.readFileSync(absPath, 'utf8');
 
   const input = {
@@ -50,7 +51,9 @@ function compileSolidity(filePath, contractName) {
           }
         }
         if (remaps.length === 0) {
-          console.warn('Warning: foundry.toml found but no remappings parsed from it');
+          console.warn(
+            'Warning: foundry.toml found but no remappings parsed from it',
+          );
         }
       } catch (e) {
         // ignore parsing errors
@@ -95,34 +98,50 @@ function compileSolidity(filePath, contractName) {
     // Try remappings first (e.g. @openzeppelin/...)
     for (let [prefix, targetDir] of remappings) {
       // normalize prefix by removing trailing slash
-      const normalizedPrefix = prefix.endsWith('/') ? prefix.slice(0, -1) : prefix;
+      const normalizedPrefix = prefix.endsWith('/')
+        ? prefix.slice(0, -1)
+        : prefix;
       // match exact prefix or prefix + '/'
-      if (importPath === normalizedPrefix || importPath.startsWith(normalizedPrefix + '/')) {
-        const rest = importPath === normalizedPrefix ? '' : importPath.slice(normalizedPrefix.length + 1);
+      if (
+        importPath === normalizedPrefix ||
+        importPath.startsWith(normalizedPrefix + '/')
+      ) {
+        const rest =
+          importPath === normalizedPrefix
+            ? ''
+            : importPath.slice(normalizedPrefix.length + 1);
         const candidate = path.join(targetDir, rest);
-        if (fs.existsSync(candidate)) return { contents: fs.readFileSync(candidate, 'utf8') };
+        if (fs.existsSync(candidate))
+          return { contents: fs.readFileSync(candidate, 'utf8') };
       }
     }
 
     // node_modules fallback
     const nmCandidate = path.join(process.cwd(), 'node_modules', importPath);
-    if (fs.existsSync(nmCandidate)) return { contents: fs.readFileSync(nmCandidate, 'utf8') };
+    if (fs.existsSync(nmCandidate))
+      return { contents: fs.readFileSync(nmCandidate, 'utf8') };
 
     // relative to main file
     const relCandidate = path.resolve(mainDir, importPath);
-    if (fs.existsSync(relCandidate)) return { contents: fs.readFileSync(relCandidate, 'utf8') };
+    if (fs.existsSync(relCandidate))
+      return { contents: fs.readFileSync(relCandidate, 'utf8') };
 
     // absolute / project-root relative
     const rootCandidate = path.resolve(process.cwd(), importPath);
-    if (fs.existsSync(rootCandidate)) return { contents: fs.readFileSync(rootCandidate, 'utf8') };
+    if (fs.existsSync(rootCandidate))
+      return { contents: fs.readFileSync(rootCandidate, 'utf8') };
 
     return { error: 'File import callback not supported for ' + importPath };
   }
 
-  const output = JSON.parse(solc.compile(JSON.stringify(input), { import: findImports }));
+  const output = JSON.parse(
+    solc.compile(JSON.stringify(input), { import: findImports }),
+  );
   if (output.errors) {
     const hasFatal = output.errors.some((e) => e.severity === 'error');
-    output.errors.forEach((e) => console.error(e.formattedMessage || e.message));
+    output.errors.forEach((e) =>
+      console.error(e.formattedMessage || e.message),
+    );
     if (hasFatal) throw new Error('Compilation failed with errors');
   }
 
@@ -136,14 +155,20 @@ function compileSolidity(filePath, contractName) {
       if (contracts[contractName]) matches.push(file);
     }
     if (matches.length === 1) {
-      console.warn(`Warning: contract ${contractName} found in ${matches[0]}, not in the primary file`);
+      console.warn(
+        `Warning: contract ${contractName} found in ${matches[0]}, not in the primary file`,
+      );
       contract = output.contracts[matches[0]][contractName];
     } else if (matches.length > 1) {
       throw new Error(
-        `Ambiguous contract name "${contractName}" found in multiple files: ${matches.join(', ')}. Rename to disambiguate.`
+        `Ambiguous contract name "${contractName}" found in multiple files: ${matches.join(
+          ', ',
+        )}. Rename to disambiguate.`,
       );
     } else {
-      throw new Error(`Contract ${contractName} not found in ${filePath} or any imported file`);
+      throw new Error(
+        `Contract ${contractName} not found in ${filePath} or any imported file`,
+      );
     }
   }
 
@@ -158,7 +183,7 @@ function compileSolidity(filePath, contractName) {
     const unique = [...new Set(unlinked)];
     throw new Error(
       `Bytecode contains unlinked library references: ${unique.join(', ')}. ` +
-      `You must link these libraries before deploying.`
+        `You must link these libraries before deploying.`,
     );
   }
 

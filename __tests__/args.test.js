@@ -8,15 +8,24 @@ describe('parseConstructorArgs', () => {
   });
 
   test('valid JSON array of strings', () => {
-    expect(parseConstructorArgs('["0xabc", "1000"]')).toEqual(['0xabc', '1000']);
+    expect(parseConstructorArgs('["0xabc", "1000"]')).toEqual([
+      '0xabc',
+      '1000',
+    ]);
   });
 
   test('valid JSON array of mixed types', () => {
-    expect(parseConstructorArgs('["0xabc", 1000, true]')).toEqual(['0xabc', 1000, true]);
+    expect(parseConstructorArgs('["0xabc", 1000, true]')).toEqual([
+      '0xabc',
+      1000,
+      true,
+    ]);
   });
 
   test('invalid JSON string starting with [', () => {
-    expect(() => parseConstructorArgs('["0xabc",')).toThrow('Invalid JSON for --args');
+    expect(() => parseConstructorArgs('["0xabc",')).toThrow(
+      'Invalid JSON for --args',
+    );
   });
 
   test('CSV single value', () => {

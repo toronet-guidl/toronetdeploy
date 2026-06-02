@@ -155,7 +155,7 @@ describe('CLI integration', () => {
     await runCli();
 
     expect(deployContract).toHaveBeenCalledWith(
-      expect.objectContaining({ network: 'mainnet' })
+      expect.objectContaining({ network: 'mainnet' }),
     );
   });
 });

@@ -15,7 +15,11 @@ function setupTempProject() {
   fs.mkdirSync(contractsDir, { recursive: true });
   const filePath = path.join(contractsDir, 'MyContract.sol');
   fs.writeFileSync(filePath, 'contract MyContract {}', 'utf8');
-  return { dir, filePath, cleanup: () => fs.rmSync(dir, { recursive: true, force: true }) };
+  return {
+    dir,
+    filePath,
+    cleanup: () => fs.rmSync(dir, { recursive: true, force: true }),
+  };
 }
 
 function makeOutput(filePath, contractName, bytecode = '00', abi = []) {
@@ -49,15 +53,19 @@ describe('compileSolidity file resolution', () => {
   });
 
   test('file not found throws', () => {
-    expect(() => compileSolidity('missing.sol', 'Missing')).toThrow('Solidity file not found');
+    expect(() => compileSolidity('missing.sol', 'Missing')).toThrow(
+      'Solidity file not found',
+    );
   });
 
   test('compiler returns fatal error', () => {
     const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     solc.compile.mockReturnValue(
-      JSON.stringify({ errors: [{ severity: 'error', message: 'fatal' }] })
+      JSON.stringify({ errors: [{ severity: 'error', message: 'fatal' }] }),
     );
-    expect(() => compileSolidity(temp.filePath, 'MyContract')).toThrow('Compilation failed with errors');
+    expect(() => compileSolidity(temp.filePath, 'MyContract')).toThrow(
+      'Compilation failed with errors',
+    );
     errorSpy.mockRestore();
   });
 
@@ -70,7 +78,7 @@ describe('compileSolidity file resolution', () => {
             MyContract: { abi: [], evm: { bytecode: { object: '00' } } },
           },
         },
-      })
+      }),
     );
 
     const result = compileSolidity(temp.filePath, 'MyContract');
@@ -85,19 +93,25 @@ describe('compileSolidity file resolution', () => {
             Other: { abi: [], evm: { bytecode: { object: '00' } } },
           },
         },
-      })
+      }),
     );
 
-    expect(() => compileSolidity(temp.filePath, 'MyContract')).toThrow(/Contract MyContract not found/);
+    expect(() => compileSolidity(temp.filePath, 'MyContract')).toThrow(
+      /Contract MyContract not found/,
+    );
   });
 
   test('bytecode is empty string', () => {
     solc.compile.mockReturnValue(makeOutput(temp.filePath, 'MyContract', ''));
-    expect(() => compileSolidity(temp.filePath, 'MyContract')).toThrow('Bytecode is empty');
+    expect(() => compileSolidity(temp.filePath, 'MyContract')).toThrow(
+      'Bytecode is empty',
+    );
   });
 
   test('happy path returns abi and 0x-prefixed bytecode', () => {
-    solc.compile.mockReturnValue(makeOutput(temp.filePath, 'MyContract', 'abc123', ['abi']));
+    solc.compile.mockReturnValue(
+      makeOutput(temp.filePath, 'MyContract', 'abc123', ['abi']),
+    );
     const result = compileSolidity(temp.filePath, 'MyContract');
     expect(result).toEqual({ abi: ['abi'], bytecode: '0xabc123' });
   });
@@ -120,13 +134,17 @@ describe('compileSolidity unlinked library detection', () => {
   });
 
   test('bytecode with placeholders throws', () => {
-    solc.compile.mockReturnValue(makeOutput(temp.filePath, 'MyContract', '__$abcdef$__'));
-    expect(() => compileSolidity(temp.filePath, 'MyContract')).toThrow('unlinked library references');
+    solc.compile.mockReturnValue(
+      makeOutput(temp.filePath, 'MyContract', '__$abcdef$__'),
+    );
+    expect(() => compileSolidity(temp.filePath, 'MyContract')).toThrow(
+      'unlinked library references',
+    );
   });
 
   test('bytecode with multiple placeholders lists all', () => {
     solc.compile.mockReturnValue(
-      makeOutput(temp.filePath, 'MyContract', '__$abcdef$____$123456$__')
+      makeOutput(temp.filePath, 'MyContract', '__$abcdef$____$123456$__'),
     );
     try {
       compileSolidity(temp.filePath, 'MyContract');

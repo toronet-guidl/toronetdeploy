@@ -25,16 +25,16 @@ CommonJS:
 const { deployContract } = require('toronetdeploy');
 
 async function run() {
-	const { address, abi } = await deployContract({
-		file: 'contracts/MyToken.sol',
-		contract: 'MyToken',
-		owner: '0xYourOwnerAddress',
-		args: ['0xabc...', '1000'],
-		network: 'testnet',
-	});
+  const { address, abi } = await deployContract({
+    file: 'contracts/MyToken.sol',
+    contract: 'MyToken',
+    owner: '0xYourOwnerAddress',
+    args: ['0xabc...', '1000'],
+    network: 'testnet',
+  });
 
-	console.log('Deployed at:', address);
-	console.log('ABI:', abi);
+  console.log('Deployed at:', address);
+  console.log('ABI:', abi);
 }
 
 run().catch(console.error);
@@ -46,11 +46,11 @@ ESM:
 import { deployContract } from 'toronetdeploy';
 
 const { address, abi } = await deployContract({
-	file: 'contracts/MyToken.sol',
-	contract: 'MyToken',
-	owner: '0xYourOwnerAddress',
-	args: ['0xabc...', '1000'],
-	network: 'testnet',
+  file: 'contracts/MyToken.sol',
+  contract: 'MyToken',
+  owner: '0xYourOwnerAddress',
+  args: ['0xabc...', '1000'],
+  network: 'testnet',
 });
 
 console.log('Deployed at:', address);

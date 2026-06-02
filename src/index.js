@@ -28,7 +28,9 @@ async function deployContract(opts = {}) {
   if (!contract) throw new Error('deployContract: `contract` is required');
   if (!owner) throw new Error('deployContract: `owner` is required');
   if (!isValidAddress(owner)) {
-    throw new Error('deployContract: `owner` must be a valid Toronet address (0x + 40 hex chars)');
+    throw new Error(
+      'deployContract: `owner` must be a valid Toronet address (0x + 40 hex chars)',
+    );
   }
 
   const constructorArgs = Array.isArray(opts.args)
