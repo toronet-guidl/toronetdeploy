@@ -2,7 +2,7 @@
 'toronetdeploy': major
 ---
 
-\# Add library support
+# Add library support
 
 - import `toronetdeploy` in your code and deploy contracts from code
 - esm and commonjs supports
