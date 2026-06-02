@@ -1,5 +1,0 @@
----
-'toronetdeploy': patch
----
-
-npm ignore

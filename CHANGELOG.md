@@ -1,5 +1,11 @@
 # toronetdeploy
 
+## 3.0.1
+
+### Patch Changes
+
+- a3856e3: npm ignore
+
 ## 3.0.0
 
 ### Major Changes
