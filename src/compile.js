@@ -1,63 +1,6 @@
-#!/usr/bin/env node
-/*
-Reusable deploy script for ToroSDK
-
-Usage:
-  npx toronetdeploy --file contracts/MyToken.sol --contract MyToken \
-    --owner 0xYourOwnerAddress --args '["0xabc...", "1000"]' --network testnet
-
-Install dependencies:
-  npm install solc torosdk
-
-This script compiles a single Solidity file and deploys the specified contract
-using ToroSDK's `deploySmartContract`.
-*/
-
 const fs = require('fs');
 const path = require('path');
 const solc = require('solc');
-const { initializeSDK, deploySmartContract } = require('torosdk');
-
-function usage() {
-  console.log(
-    'Usage:\n\tnpx toronetdeploy --file <path> --contract <name> --owner <address> [--args <json|csv>] [--network testnet|mainnet] [--token <token>]\n\n\
-    Options:\n\t--file: Path to Solidity file containing the contract\n\t--contract: Name of the contract to deploy (must be in the specified file)\n\t--owner: Address of the owner deploying the contract\n\t--args: Constructor arguments as JSON array or comma-separated values\n\t--network: Network to deploy to (default: testnet)\n\t--token: Optional token for deployment if required by your setup\n\t--help, -h: Show this help message',
-  );
-  process.exit(1);
-}
-
-function parseArgs() {
-  const argv = process.argv.slice(2);
-  const out = {};
-  for (let i = 0; i < argv.length; i++) {
-    const a = argv[i];
-    if (a === '--file') out.file = argv[++i];
-    else if (a === '--contract') out.contract = argv[++i];
-    else if (a === '--owner') out.owner = argv[++i];
-    else if (a === '--network') out.network = argv[++i];
-    else if (a === '--token') out.token = argv[++i];
-    else if (a === '--args') out.args = argv[++i];
-    else if (a === '--help' || a === '-h') usage();
-  }
-  return out;
-}
-
-function parseConstructorArgs(argStr) {
-  if (!argStr) return [];
-  argStr = argStr.trim();
-  if (argStr.startsWith('[')) {
-    try {
-      return JSON.parse(argStr);
-    } catch (e) {
-      throw new Error('Invalid JSON for --args');
-    }
-  }
-  // comma-separated
-  return argStr
-    .split(',')
-    .map((s) => s.trim())
-    .filter(Boolean);
-}
 
 function compileSolidity(filePath, contractName) {
   const absPath = path.resolve(filePath);
@@ -71,7 +14,7 @@ function compileSolidity(filePath, contractName) {
     },
     settings: {
       optimizer: { enabled: true, runs: 200 },
-      evmVersion: 'paris', // important
+      evmVersion: 'paris',
       outputSelection: {
         '*': { '*': ['abi', 'evm.bytecode'] },
       },
@@ -95,8 +38,8 @@ function compileSolidity(filePath, contractName) {
             .map((s) => s.trim())
             .filter(Boolean);
           for (let it of items) {
-            // remove quotes
-            it = it.replace(/^\s*['"]?/, '').replace(/['"]?\s*$/, '');
+            // remove quotes and whitespace
+            it = it.trim().replace(/^["']|["']$/g, '');
             // expect format prefix=target
             const parts = it.split('=');
             if (parts.length !== 2) continue;
@@ -105,6 +48,9 @@ function compileSolidity(filePath, contractName) {
             const absTarget = path.resolve(projectRoot, target);
             remaps.push([prefix, absTarget]);
           }
+        }
+        if (remaps.length === 0) {
+          console.warn('Warning: foundry.toml found but no remappings parsed from it');
         }
       } catch (e) {
         // ignore parsing errors
@@ -147,10 +93,12 @@ function compileSolidity(filePath, contractName) {
 
   function findImports(importPath) {
     // Try remappings first (e.g. @openzeppelin/...)
-    for (const [prefix, targetDir] of remappings) {
+    for (let [prefix, targetDir] of remappings) {
+      // normalize prefix by removing trailing slash
+      const normalizedPrefix = prefix.endsWith('/') ? prefix.slice(0, -1) : prefix;
       // match exact prefix or prefix + '/'
-      if (importPath === prefix || importPath.startsWith(prefix + '/')) {
-        const rest = importPath === prefix ? '' : importPath.slice(prefix.length + 1);
+      if (importPath === normalizedPrefix || importPath.startsWith(normalizedPrefix + '/')) {
+        const rest = importPath === normalizedPrefix ? '' : importPath.slice(normalizedPrefix.length + 1);
         const candidate = path.join(targetDir, rest);
         if (fs.existsSync(candidate)) return { contents: fs.readFileSync(candidate, 'utf8') };
       }
@@ -178,53 +126,43 @@ function compileSolidity(filePath, contractName) {
     if (hasFatal) throw new Error('Compilation failed with errors');
   }
 
-  const fileContracts = output.contracts[path.basename(absPath)];
-  if (!fileContracts) throw new Error('No contracts found in compilation output');
-  const contract = fileContracts[contractName];
-  if (!contract) throw new Error(`Contract ${contractName} not found in ${filePath}`);
+  const primaryKey = path.basename(absPath);
+  let contract = output.contracts[primaryKey]?.[contractName];
+
+  if (!contract) {
+    // Search all compiled files for the contract name
+    const matches = [];
+    for (const [file, contracts] of Object.entries(output.contracts || {})) {
+      if (contracts[contractName]) matches.push(file);
+    }
+    if (matches.length === 1) {
+      console.warn(`Warning: contract ${contractName} found in ${matches[0]}, not in the primary file`);
+      contract = output.contracts[matches[0]][contractName];
+    } else if (matches.length > 1) {
+      throw new Error(
+        `Ambiguous contract name "${contractName}" found in multiple files: ${matches.join(', ')}. Rename to disambiguate.`
+      );
+    } else {
+      throw new Error(`Contract ${contractName} not found in ${filePath} or any imported file`);
+    }
+  }
 
   const abi = contract.abi;
   const bytecode = contract.evm.bytecode.object;
   if (!bytecode || bytecode.length === 0)
     throw new Error('Bytecode is empty (abstract contract or interface?)');
 
+  // Check for unlinked library references
+  const unlinked = bytecode.match(/__\$[a-f0-9]+\$__/g);
+  if (unlinked) {
+    const unique = [...new Set(unlinked)];
+    throw new Error(
+      `Bytecode contains unlinked library references: ${unique.join(', ')}. ` +
+      `You must link these libraries before deploying.`
+    );
+  }
+
   return { abi, bytecode: '0x' + bytecode };
 }
 
-async function main() {
-  const opts = parseArgs();
-  if (!opts.file || !opts.contract || !opts.owner) usage();
-
-  const constructorArgs = parseConstructorArgs(opts.args);
-  const network = opts.network || 'testnet';
-  const token = opts.token || undefined;
-
-  console.log('Compiling', opts.file, 'contract', opts.contract);
-  const { abi, bytecode } = compileSolidity(opts.file, opts.contract);
-
-  console.log('Initializing ToroSDK (network:', network + ')');
-  initializeSDK({ network });
-
-  console.log('Deploying contract...');
-  try {
-    const result = await deploySmartContract({
-      owner: opts.owner,
-      constructorArgs,
-      abi,
-      bytecode,
-      token,
-      network: network, // optional override; initializeSDK already set network as well
-    });
-
-    console.log('Deployed address:', result.address);
-  } catch (err) {
-    console.error('Deployment failed:', err && err.message ? err.message.toString() : err.toString());
-    console.error(err);
-    process.exitCode = 1;
-  }
-}
-
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+module.exports = { compileSolidity };
