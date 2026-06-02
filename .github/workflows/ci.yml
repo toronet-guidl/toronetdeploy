@@ -1,29 +1,40 @@
-name: CI
+name: Tests
 
 on:
-  pull_request:
   push:
-    branches:
-      - main
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
 
 jobs:
-  ci:
+  test:
+    name: Run tests (Node ${{ matrix.node-version }})
     runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v4
+    strategy:
+      matrix:
+        node-version: [18, 20, 22]
 
-      - name: Use Node.js
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
-      - name: Run CI
-        run: npm run ci
+      - name: Run tests
+        run: npm test
+
+      - name: Upload coverage report
+        if: matrix.node-version == 20
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage/
+          retention-days: 14

@@ -44,7 +44,15 @@ async function main() {
   console.log('Deployed address:', address);
 }
 
-main().catch((err) => {
-  console.error(err.message || err);
-  process.exit(1);
-});
+function runCli() {
+  return main().catch((err) => {
+    console.error(err.message || err);
+    process.exitCode = 1;
+  });
+}
+
+if (require.main === module) {
+  runCli();
+}
+
+module.exports = { parseArgs, usage, main, runCli };
