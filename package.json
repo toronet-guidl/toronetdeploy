@@ -17,7 +17,7 @@
     "format": "prettier --write .",
     "check-format": "prettier --check .",
     "ci": "npm run check-format",
-    "local-release": "changeset version && changeset publish",
+    "local-release": "changeset version && changeset publish --verbose",
     "prepublishOnly": "npm run ci",
     "test": "jest --coverage",
     "test:watch": "jest --watch"

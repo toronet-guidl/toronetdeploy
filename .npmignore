@@ -1,0 +1,22 @@
+# Dependencies and lockfiles
+node_modules/
+package-lock.json
+
+# Test and coverage output
+__tests__/
+coverage/
+
+# Changeset metadata
+.changeset/
+
+# VCS and editor config
+.git/
+.github/
+.vscode/
+.gitignore
+.prettierrc
+
+# OS / tooling noise
+*.log
+.DS_Store
+Thumbs.db
