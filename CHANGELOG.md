@@ -1,5 +1,11 @@
 # toronetdeploy
 
+## 3.1.1
+
+### Patch Changes
+
+- c14dc34: bug fixes
+
 ## 3.1.0
 
 ### Minor Changes
