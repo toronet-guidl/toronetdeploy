@@ -74,8 +74,7 @@ function parseArgs() {
       const pkg = require('../package.json');
       console.log(`toronetdeploy version ${pkg.version}`);
       process.exit(0);
-    }
-    else if (a === '--help' || a === '-h') usage();
+    } else if (a === '--help' || a === '-h') usage();
   }
   return out;
 }
