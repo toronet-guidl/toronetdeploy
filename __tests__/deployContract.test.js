@@ -6,6 +6,10 @@ jest.mock('../src/args', () => ({
   parseConstructorArgs: jest.fn(),
 }));
 
+jest.mock('../src/deployDump', () => ({
+  writeDeploymentDump: jest.fn(),
+}));
+
 jest.mock('torosdk', () => ({
   initializeSDK: jest.fn(),
   deploySmartContract: jest.fn(),
@@ -13,6 +17,7 @@ jest.mock('torosdk', () => ({
 
 const { compileSolidity } = require('../src/compile');
 const { parseConstructorArgs } = require('../src/args');
+const { writeDeploymentDump } = require('../src/deployDump');
 const { initializeSDK, deploySmartContract } = require('torosdk');
 const { deployContract } = require('../src/index');
 
@@ -20,6 +25,7 @@ describe('deployContract validation', () => {
   beforeEach(() => {
     compileSolidity.mockReset();
     parseConstructorArgs.mockReset();
+    writeDeploymentDump.mockReset();
     initializeSDK.mockReset();
     deploySmartContract.mockReset();
   });
@@ -67,6 +73,7 @@ describe('deployContract args handling', () => {
   beforeEach(() => {
     compileSolidity.mockReset();
     parseConstructorArgs.mockReset();
+    writeDeploymentDump.mockReset();
     initializeSDK.mockReset();
     deploySmartContract.mockReset();
     compileSolidity.mockReturnValue({ abi: [], bytecode: '0x00' });
@@ -140,6 +147,7 @@ describe('deployContract SDK interactions', () => {
   beforeEach(() => {
     compileSolidity.mockReset();
     parseConstructorArgs.mockReset();
+    writeDeploymentDump.mockReset();
     initializeSDK.mockReset();
     deploySmartContract.mockReset();
     parseConstructorArgs.mockReturnValue([]);
@@ -170,6 +178,8 @@ describe('deployContract SDK interactions', () => {
         owner: '0x' + 'a'.repeat(40),
       }),
     ).rejects.toThrow('fail');
+
+    expect(writeDeploymentDump).not.toHaveBeenCalled();
   });
 
   test('happy path returns address and abi', async () => {
@@ -182,6 +192,14 @@ describe('deployContract SDK interactions', () => {
         owner: '0x' + 'a'.repeat(40),
       }),
     ).resolves.toEqual({ address: '0xabc', abi: ['abi'] });
+
+    expect(writeDeploymentDump).toHaveBeenCalledWith(
+      expect.objectContaining({
+        contractName: 'C',
+        owner: '0x' + 'a'.repeat(40),
+        address: '0xabc',
+      }),
+    );
   });
 
   test('token is passed through when provided', async () => {

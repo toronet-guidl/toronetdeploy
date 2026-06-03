@@ -17,6 +17,9 @@ describe('CLI argument parsing', () => {
   });
 
   test('all flags provided', () => {
+    jest.doMock('../src/deployDump', () => ({
+      writeDeploymentDump: jest.fn(),
+    }));
     const { parseArgs } = require('../src/cli');
     process.argv = [
       'node',
@@ -46,24 +49,36 @@ describe('CLI argument parsing', () => {
   });
 
   test('--help flag exits', () => {
+    jest.doMock('../src/deployDump', () => ({
+      writeDeploymentDump: jest.fn(),
+    }));
     const { parseArgs } = require('../src/cli');
     process.argv = ['node', 'cli.js', '--help'];
     expect(() => parseArgs()).toThrow('process.exit');
   });
 
   test('-h flag exits', () => {
+    jest.doMock('../src/deployDump', () => ({
+      writeDeploymentDump: jest.fn(),
+    }));
     const { parseArgs } = require('../src/cli');
     process.argv = ['node', 'cli.js', '-h'];
     expect(() => parseArgs()).toThrow('process.exit');
   });
 
   test('unknown flags ignored', () => {
+    jest.doMock('../src/deployDump', () => ({
+      writeDeploymentDump: jest.fn(),
+    }));
     const { parseArgs } = require('../src/cli');
     process.argv = ['node', 'cli.js', '--unknown', 'x'];
     expect(parseArgs()).toEqual({});
   });
 
   test('missing required flags causes usage and exit', async () => {
+    jest.doMock('../src/deployDump', () => ({
+      writeDeploymentDump: jest.fn(),
+    }));
     const { main } = require('../src/cli');
     process.argv = ['node', 'cli.js'];
 

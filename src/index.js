@@ -1,5 +1,6 @@
 const { compileSolidity } = require('./compile');
 const { parseConstructorArgs } = require('./args');
+const { writeDeploymentDump } = require('./deployDump');
 const { initializeSDK, deploySmartContract } = require('torosdk');
 
 function isValidAddress(addr) {
@@ -14,6 +15,7 @@ function isValidAddress(addr) {
  * @property {Array|string} [args] - Constructor args (array or JSON/CSV string)
  * @property {'testnet'|'mainnet'} [network] - Defaults to 'testnet'
  * @property {string} [token] - Optional auth token
+ * @property {boolean} [skipDump] - If true, skips writing the deployment dump file
  */
 
 /**
@@ -22,7 +24,7 @@ function isValidAddress(addr) {
  * @returns {Promise<{ address: string, abi: Array }>}
  */
 async function deployContract(opts = {}) {
-  const { file, contract, owner, network = 'testnet', token } = opts;
+  const { file, contract, owner, network = 'testnet', token, skipDump = true } = opts;
 
   if (!file) throw new Error('deployContract: `file` is required');
   if (!contract) throw new Error('deployContract: `contract` is required');
@@ -53,6 +55,24 @@ async function deployContract(opts = {}) {
     token,
     network,
   });
+  try {
+    if (!skipDump) {
+      writeDeploymentDump({
+        file,
+        contractName: contract,
+        owner,
+        constructorArgs,
+        bytecode,
+        abi,
+        address: result.address,
+        network,
+      });
+    }
+  } catch (err) {
+    console.warn(
+      `Warning: failed to write deployment dump: ${err?.message ?? err}`,
+    );
+  }
 
   return { address: result.address, abi };
 }

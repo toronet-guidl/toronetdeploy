@@ -48,8 +48,8 @@ async function runCompileIfNeeded() {
 
 function usage() {
   console.log(
-    'Usage:\n\tnpx toronetdeploy --file <path> --contract <name> --owner <address> [--args <json|csv>] [--network testnet|mainnet] [--token <token>]\n\n\
-    Options:\n\t--file: Path to Solidity file containing the contract\n\t--contract: Name of the contract to deploy (must be in the specified file)\n\t--owner: Address of the owner deploying the contract\n\t--args: Constructor arguments as JSON array or comma-separated values\n\t--network: Network to deploy to (default: testnet)\n\t--token: Optional token for deployment if required by your setup\n\t--help, -h: Show this help message',
+    'Usage:\n\tnpx toronetdeploy --file <path> --contract <name> --owner <address> [--args <json|csv>] [--network testnet|mainnet] [--token <token>] [--skip-dump]\n\n\
+    Options:\n\t--file: Path to Solidity file containing the contract\n\t--contract: Name of the contract to deploy (must be in the specified file)\n\t--owner: Address of the owner deploying the contract\n\t--args: Constructor arguments as JSON array or comma-separated values\n\t--network: Network to deploy to (default: testnet)\n\t--token: Optional token for deployment if required by your setup\n\t--skip-dump: Skip writing the deployment dump file\n\t--help, -h: Show this help message',
   );
   process.exit(1);
 }
@@ -65,6 +65,7 @@ function parseArgs() {
     else if (a === '--network') out.network = argv[++i];
     else if (a === '--token') out.token = argv[++i];
     else if (a === '--args') out.args = argv[++i];
+    else if (a === '--skip-dump') out.skipDump = true;
     else if (a === '--help' || a === '-h') usage();
   }
   return out;
@@ -86,6 +87,7 @@ async function main() {
     args: opts.args,
     network: opts.network,
     token: opts.token,
+    skipDump: opts.skipDump || false,
   });
 
   console.log('Deployed address:', address);

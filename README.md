@@ -64,7 +64,22 @@ console.log('ABI:', abi);
 - `--owner` Address of the owner deploying the contract
 - `--args` Constructor arguments as JSON array or comma-separated values
 - `--network` Network to deploy to (default: `testnet`)
+- `--skip-dump` Skip writing the deployment dump file (default `false`)
 - `--token` Optional token for deployment
+
+## Deployment Metadata Dumps
+
+Each successful deployment writes a JSON dump under `deployments/` with two
+files per run:
+
+```
+deployments/<chainId>-<contractName>-<unix_timestamp>.json
+deployments/<chainId>-<contractName>-latest.json
+```
+
+The dump records deployment inputs, the deployed address/ABI, and (when
+available) Foundry artifact metadata and source files for verification. Dumps
+are only written after `deploySmartContract()` succeeds.
 
 License: MIT
 

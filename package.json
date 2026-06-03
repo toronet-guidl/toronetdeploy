@@ -35,6 +35,7 @@
     "url": "git+https://github.com/toronet-guidl/toronetdeploy.git"
   },
   "dependencies": {
+    "ethereum-cryptography": "^2.1.3",
     "solc": "^0.8.34",
     "torosdk": "^0.2.0"
   },
