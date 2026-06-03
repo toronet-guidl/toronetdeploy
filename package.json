@@ -36,7 +36,7 @@
   },
   "dependencies": {
     "ethereum-cryptography": "^2.1.3",
-    "solc": "^0.5.0",
+    "solc": "^0.8.34",
     "torosdk": "^0.2.0"
   },
   "devDependencies": {

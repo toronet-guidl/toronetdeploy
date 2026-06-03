@@ -3,6 +3,7 @@ const path = require('path');
 const solc = require('solc');
 
 function compileSolidity(filePath, contractName) {
+  console.log(`Compiling ${contractName} from ${filePath}...`);
   const absPath = path.resolve(filePath);
   if (!fs.existsSync(absPath))
     throw new Error('Solidity file not found: ' + absPath);
@@ -138,9 +139,10 @@ function compileSolidity(filePath, contractName) {
     solc.compile(JSON.stringify(input), { import: findImports }),
   );
   if (output.errors) {
+    console.log('Compilation output had errors/warnings:');
     const hasFatal = output.errors.some((e) => e.severity === 'error');
-    output.errors.forEach((e) =>
-      console.error(e.formattedMessage || e.message),
+    output.errors.forEach(
+      (e) => console.error(e),
     );
     if (hasFatal) throw new Error('Compilation failed with errors');
   }

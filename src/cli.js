@@ -4,6 +4,8 @@ const path = require('path');
 const { spawn } = require('child_process');
 const { deployContract } = require('./index');
 
+const isWindows = process.platform === 'win32';
+
 function detectEnvironment(cwd = process.cwd()) {
   const foundryPath = path.join(cwd, 'foundry.toml');
   const hardhatConfigs = [
@@ -25,7 +27,7 @@ function detectEnvironment(cwd = process.cwd()) {
 
 function runCommand(command, args) {
   return new Promise((resolve, reject) => {
-    const child = spawn(command, args, { stdio: 'inherit' });
+    const child = spawn(command, args, { stdio: 'inherit', shell: true });
     child.on('error', (err) => reject(err));
     child.on('close', (code, signal) => {
       if (code === 0) return resolve();
@@ -44,7 +46,7 @@ async function runCompileIfNeeded() {
     await runCommand('forge', ['build']);
   } else if (env === 'hardhat') {
     console.log('Detected Hardhat project. Running npx hardhat compile...');
-    await runCommand('npx', ['hardhat', 'compile']);
+    await runCommand(isWindows ? 'npx.cmd' : 'npx', ['hardhat', 'compile']);
   }
 }
 
@@ -68,6 +70,11 @@ function parseArgs() {
     else if (a === '--token') out.token = argv[++i];
     else if (a === '--args') out.args = argv[++i];
     else if (a === '--skip-dump') out.skipDump = true;
+    else if (a === '-v' || a === '--version') {
+      const pkg = require('../package.json');
+      console.log(`toronetdeploy version ${pkg.version}`);
+      process.exit(0);
+    }
     else if (a === '--help' || a === '-h') usage();
   }
   return out;
