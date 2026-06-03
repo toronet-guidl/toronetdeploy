@@ -190,6 +190,7 @@ describe('deployContract SDK interactions', () => {
         file: 'f.sol',
         contract: 'C',
         owner: '0x' + 'a'.repeat(40),
+        skipDump: false,
       }),
     ).resolves.toEqual({ address: '0xabc', abi: ['abi'] });
 

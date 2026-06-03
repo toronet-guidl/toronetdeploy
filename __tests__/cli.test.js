@@ -227,6 +227,7 @@ describe('CLI compile step', () => {
 
     expect(spawn).toHaveBeenCalledWith('forge', ['build'], {
       stdio: 'inherit',
+      shell: true,
     });
     expect(deployContract).toHaveBeenCalled();
   });
@@ -255,8 +256,11 @@ describe('CLI compile step', () => {
 
     await runCli();
 
-    expect(spawn).toHaveBeenCalledWith('npx', ['hardhat', 'compile'], {
+    const isWindows = process.platform === 'win32';
+
+    expect(spawn).toHaveBeenCalledWith( isWindows ? 'npx.cmd' : 'npx', ['hardhat', 'compile'], {
       stdio: 'inherit',
+      shell: true,
     });
     expect(deployContract).toHaveBeenCalled();
   });
