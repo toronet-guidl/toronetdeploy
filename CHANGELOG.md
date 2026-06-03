@@ -1,5 +1,11 @@
 # toronetdeploy
 
+## 3.1.0
+
+### Minor Changes
+
+- 20bdd0a: deployment dump
+
 ## 3.0.1
 
 ### Patch Changes
