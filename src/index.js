@@ -24,7 +24,14 @@ function isValidAddress(addr) {
  * @returns {Promise<{ address: string, abi: Array }>}
  */
 async function deployContract(opts = {}) {
-  const { file, contract, owner, network = 'testnet', token, skipDump = true } = opts;
+  const {
+    file,
+    contract,
+    owner,
+    network = 'testnet',
+    token,
+    skipDump = true,
+  } = opts;
 
   if (!file) throw new Error('deployContract: `file` is required');
   if (!contract) throw new Error('deployContract: `contract` is required');

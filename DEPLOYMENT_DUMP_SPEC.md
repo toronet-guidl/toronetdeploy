@@ -19,6 +19,7 @@ deployments/
 ```
 
 **Examples:**
+
 ```
 deployments/54321-ToroToken-1700000000.json    # testnet, timestamped
 deployments/77777-ToroToken-latest.json        # mainnet, latest pointer
@@ -33,11 +34,13 @@ deployments/77777-ToroToken-latest.json        # mainnet, latest pointer
   "_format": "toronet-deployment-v1",
   "specVersion": "1.0.0",
 
-  "network": "testnet",        // "testnet" | "mainnet"
-  "chainId": 54321,            // 54321 (testnet) | 77777 (mainnet)
-  "timestamp": 1700000000,     // Unix timestamp (seconds) when the dump was written
+  "network": "testnet", // "testnet" | "mainnet"
+  "chainId": 54321, // 54321 (testnet) | 77777 (mainnet)
+  "timestamp": 1700000000, // Unix timestamp (seconds) when the dump was written
 
-  "deployment": { /* DeploymentRecord */ }
+  "deployment": {
+    /* DeploymentRecord */
+  }
 }
 ```
 
@@ -53,7 +56,7 @@ array of transactions - the tool deploys one contract per run.
   "contractName": "ToroToken",
 
   "status": "success", // "success" | "pending" | "failed"
-  "error": null,        // present only when status is "failed"
+  "error": null, // present only when status is "failed"
 
   "owner": "0xOwnerAddress",
 
@@ -119,39 +122,39 @@ array of transactions - the tool deploys one contract per run.
 
 ## Field Types Reference
 
-| Field | Type | Notes |
-|---|---|---|
-| chainId | number | 54321 or 77777 |
-| timestamp | number | Unix seconds |
-| contractAddress, owner | string | 0x-prefixed Toronet address |
-| contractAbi | array | Standard Solidity ABI JSON |
-| input.constructorArgs | array | Values as passed |
-| input.bytecode | string | 0x-prefixed hex, creation bytecode |
-| source.compilerVersion | string | e.g. "0.8.24+commit.e11b9ed9" |
-| source.evmVersion | string | e.g. "paris" |
-| source.optimizer.enabled | boolean | |
-| source.optimizer.runs | number | |
-| source.viaIR | boolean | |
-| source.contractPath | string | Relative to project root |
-| source.bytecodeHash | string | 0x-prefixed keccak256 hex |
-| source.compilerMetadata | object | Parsed Foundry metadata JSON |
-| source.sources | object | Map keyed by path |
-| source.sources[path].isPrimary | boolean | true for exactly one entry |
-| source.sources[path].keccak256 | string | 0x-prefixed hash |
-| source.sources[path].content | string | Raw Solidity source or null |
-| status | string | success | pending | failed |
-| error | string | null | error string |
+| Field                          | Type    | Notes                              |
+| ------------------------------ | ------- | ---------------------------------- | ------------ | ------ |
+| chainId                        | number  | 54321 or 77777                     |
+| timestamp                      | number  | Unix seconds                       |
+| contractAddress, owner         | string  | 0x-prefixed Toronet address        |
+| contractAbi                    | array   | Standard Solidity ABI JSON         |
+| input.constructorArgs          | array   | Values as passed                   |
+| input.bytecode                 | string  | 0x-prefixed hex, creation bytecode |
+| source.compilerVersion         | string  | e.g. "0.8.24+commit.e11b9ed9"      |
+| source.evmVersion              | string  | e.g. "paris"                       |
+| source.optimizer.enabled       | boolean |                                    |
+| source.optimizer.runs          | number  |                                    |
+| source.viaIR                   | boolean |                                    |
+| source.contractPath            | string  | Relative to project root           |
+| source.bytecodeHash            | string  | 0x-prefixed keccak256 hex          |
+| source.compilerMetadata        | object  | Parsed Foundry metadata JSON       |
+| source.sources                 | object  | Map keyed by path                  |
+| source.sources[path].isPrimary | boolean | true for exactly one entry         |
+| source.sources[path].keccak256 | string  | 0x-prefixed hash                   |
+| source.sources[path].content   | string  | Raw Solidity source or null        |
+| status                         | string  | success                            | pending      | failed |
+| error                          | string  | null                               | error string |
 
 ---
 
 ## Null Field Rules
 
-| Status | contractAddress | source | error |
-|---|---|---|---|
-| success | populated | fully populated | null |
-| pending | populated | fully populated | null |
-| failed (pre-submit) | null | populated | error string |
-| failed (revert) | populated | fully populated | error string |
+| Status              | contractAddress | source          | error        |
+| ------------------- | --------------- | --------------- | ------------ |
+| success             | populated       | fully populated | null         |
+| pending             | populated       | fully populated | null         |
+| failed (pre-submit) | null            | populated       | error string |
+| failed (revert)     | populated       | fully populated | error string |
 
 ---
 

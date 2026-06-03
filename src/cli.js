@@ -30,7 +30,9 @@ function runCommand(command, args) {
     child.on('close', (code, signal) => {
       if (code === 0) return resolve();
       const suffix = signal ? ` (signal ${signal})` : ` (exit ${code})`;
-      reject(new Error(`Command failed: ${command} ${args.join(' ')}${suffix}`));
+      reject(
+        new Error(`Command failed: ${command} ${args.join(' ')}${suffix}`),
+      );
     });
   });
 }

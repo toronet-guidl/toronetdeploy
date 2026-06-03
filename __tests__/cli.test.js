@@ -203,9 +203,7 @@ describe('CLI compile step', () => {
 
   test('foundry env runs forge build before deploy', async () => {
     const spawn = mockSpawnExit(0);
-    const deployContract = jest
-      .fn()
-      .mockResolvedValue({ address: '0xabc' });
+    const deployContract = jest.fn().mockResolvedValue({ address: '0xabc' });
 
     jest.doMock('child_process', () => ({ spawn }));
     jest.doMock('fs', () => ({
@@ -235,9 +233,7 @@ describe('CLI compile step', () => {
 
   test('hardhat env runs npx hardhat compile before deploy', async () => {
     const spawn = mockSpawnExit(0);
-    const deployContract = jest
-      .fn()
-      .mockResolvedValue({ address: '0xabc' });
+    const deployContract = jest.fn().mockResolvedValue({ address: '0xabc' });
 
     jest.doMock('child_process', () => ({ spawn }));
     jest.doMock('fs', () => ({
@@ -267,9 +263,7 @@ describe('CLI compile step', () => {
 
   test('compile failure prevents deploy and sets exitCode', async () => {
     const spawn = mockSpawnExit(1);
-    const deployContract = jest
-      .fn()
-      .mockResolvedValue({ address: '0xabc' });
+    const deployContract = jest.fn().mockResolvedValue({ address: '0xabc' });
 
     jest.doMock('child_process', () => ({ spawn }));
     jest.doMock('fs', () => ({
