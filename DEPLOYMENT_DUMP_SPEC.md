@@ -40,7 +40,7 @@ deployments/77777-ToroToken-latest.json        # mainnet, latest pointer
 
   "deployment": {
     /* DeploymentRecord */
-  }
+  },
 }
 ```
 
@@ -62,7 +62,7 @@ array of transactions - the tool deploys one contract per run.
 
   "input": {
     "constructorArgs": ["0xArg1", "0xArg2"],
-    "bytecode": "0x608060..."
+    "bytecode": "0x608060...",
   },
 
   "contractAddress": "0xDeployedAddress",
@@ -71,10 +71,10 @@ array of transactions - the tool deploys one contract per run.
     {
       "type": "constructor",
       "inputs": [
-        { "name": "param1", "type": "address", "internalType": "address" }
+        { "name": "param1", "type": "address", "internalType": "address" },
       ],
-      "stateMutability": "nonpayable"
-    }
+      "stateMutability": "nonpayable",
+    },
   ],
 
   "source": {
@@ -82,7 +82,7 @@ array of transactions - the tool deploys one contract per run.
     "evmVersion": "paris",
     "optimizer": {
       "enabled": true,
-      "runs": 200
+      "runs": 200,
     },
     "viaIR": false,
     "contractPath": "src/ToroToken.sol",
@@ -97,24 +97,24 @@ array of transactions - the tool deploys one contract per run.
         "libraries": {},
         "metadata": { "bytecodeHash": "ipfs" },
         "optimizer": { "enabled": true, "runs": 200 },
-        "remappings": []
+        "remappings": [],
       },
       "sources": {
         "src/ToroToken.sol": {
           "keccak256": "0xsourcehash...",
-          "license": "MIT"
-        }
+          "license": "MIT",
+        },
       },
-      "version": 1
+      "version": 1,
     },
     "sources": {
       "src/ToroToken.sol": {
         "isPrimary": true,
         "keccak256": "0xsourcehash...",
-        "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.24;\n..."
-      }
-    }
-  }
+        "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.24;\n...",
+      },
+    },
+  },
 }
 ```
 

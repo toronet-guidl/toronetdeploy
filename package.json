@@ -16,9 +16,10 @@
   "scripts": {
     "format": "prettier --write .",
     "check-format": "prettier --check .",
-    "ci": "npm run check-format",
-    "local-release": "changeset version && changeset publish --verbose",
+    "ci": "npm run check-format && npm run test",
     "prepublishOnly": "npm run ci",
+    "create-changeset": "npx changeset",
+    "local-release": "npx changeset version && npm publish",
     "test": "jest --coverage",
     "test:watch": "jest --watch"
   },
@@ -40,8 +41,8 @@
     "torosdk": "^0.2.0"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.30.0",
-    "jest": "^29.7.0"
+    "jest": "^29.7.0",
+    "prettier": "^3.8.3"
   },
   "jest": {
     "testEnvironment": "node",

@@ -1,3 +1,6 @@
+# Doc Files
+PUBLISH.md
+
 # Dependencies and lockfiles
 node_modules/
 package-lock.json

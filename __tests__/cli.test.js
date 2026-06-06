@@ -258,10 +258,14 @@ describe('CLI compile step', () => {
 
     const isWindows = process.platform === 'win32';
 
-    expect(spawn).toHaveBeenCalledWith( isWindows ? 'npx.cmd' : 'npx', ['hardhat', 'compile'], {
-      stdio: 'inherit',
-      shell: true,
-    });
+    expect(spawn).toHaveBeenCalledWith(
+      isWindows ? 'npx.cmd' : 'npx',
+      ['hardhat', 'compile'],
+      {
+        stdio: 'inherit',
+        shell: true,
+      },
+    );
     expect(deployContract).toHaveBeenCalled();
   });
 

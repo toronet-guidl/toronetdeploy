@@ -141,7 +141,9 @@ function compileSolidity(filePath, contractName) {
   if (output.errors) {
     console.log('Compilation output had errors/warnings:');
     const hasFatal = output.errors.some((e) => e.severity === 'error');
-    output.errors.forEach((e) => console.error(e));
+    output.errors.forEach((e) =>
+      console.error(e.formattedMessage || e.message || e),
+    );
     if (hasFatal) throw new Error('Compilation failed with errors');
   }
 
