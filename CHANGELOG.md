@@ -1,5 +1,11 @@
 # toronetdeploy
 
+## 3.1.2
+
+### Patch Changes
+
+- Formatted errors for contract compilation
+
 ## 3.1.1
 
 ### Patch Changes
